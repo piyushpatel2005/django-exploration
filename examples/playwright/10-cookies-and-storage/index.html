@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookies and Storage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #storage-display {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cookies and Storage Test Page</h1>
+    
+    <div>
+        <button onclick="setLocalStorage()">Set Local Storage</button>
+        <button onclick="setSessionStorage()">Set Session Storage</button>
+        <button onclick="displayStorage()">Display Storage</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+    </div>
+    
+    <div id="storage-display">
+        <h2>Storage Values:</h2>
+        <div id="storage-content"></div>
+    </div>
+    
+    <script>
+        function setLocalStorage() {
+            localStorage.setItem('user', 'John Doe');
+            localStorage.setItem('theme', 'dark');
+            alert('Local storage set!');
+        }
+        
+        function setSessionStorage() {
+            sessionStorage.setItem('session', 'active');
+            alert('Session storage set!');
+        }
+        
+        function displayStorage() {
+            const content = document.getElementById('storage-content');
+            let html = '<p><strong>Local Storage:</strong></p><ul>';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                html += `<li>${key}: ${localStorage.getItem(key)}</li>`;
+            }
+            html += '</ul><p><strong>Session Storage:</strong></p><ul>';
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                html += `<li>${key}: ${sessionStorage.getItem(key)}</li>`;
+            }
+            html += '</ul>';
+            content.innerHTML = html;
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            document.getElementById('storage-content').innerHTML = '';
+            alert('Storage cleared!');
+        }
+    </script>
+</body>
+</html>
+

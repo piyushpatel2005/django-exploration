@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Interception</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        img {
+            max-width: 100%;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Network Interception Test Page</h1>
+    
+    <button onclick="loadData()">Load Data</button>
+    <button onclick="loadImage()">Load Image</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                document.getElementById('result').innerHTML = '<p>Data loaded: ' + JSON.stringify(data) + '</p>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<p>Error loading data: ' + error.message + '</p>';
+            }
+        }
+        
+        function loadImage() {
+            const img = document.createElement('img');
+            img.src = 'https://via.placeholder.com/300';
+            img.onload = function() {
+                document.getElementById('result').appendChild(img);
+            };
+        }
+    </script>
+</body>
+</html>
+

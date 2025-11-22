@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handling Alerts and Dialogs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .button-group {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Handling Alerts and Dialogs</h1>
+    
+    <div class="button-group">
+        <button onclick="showAlert()">Show Alert</button>
+        <button onclick="showConfirm()">Show Confirm</button>
+        <button onclick="showPrompt()">Show Prompt</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <script>
+        function showAlert() {
+            alert('Hello! This is an alert dialog.');
+        }
+        
+        function showConfirm() {
+            const result = confirm('Are you sure?');
+            document.getElementById('result').textContent = 'Confirm result: ' + result;
+        }
+        
+        function showPrompt() {
+            const result = prompt('What is your name?', 'John Doe');
+            document.getElementById('result').textContent = 'Prompt result: ' + (result || 'Cancelled');
+        }
+    </script>
+</body>
+</html>
+

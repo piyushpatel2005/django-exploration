@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interacting with Elements</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .draggable {
+            width: 100px;
+            height: 100px;
+            background-color: #e74c3c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+        }
+        #target {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #3498db;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interacting with Elements</h1>
+    
+    <form id="test-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" placeholder="Enter your name">
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email">
+        
+        <label for="country">Country:</label>
+        <select id="country" name="country">
+            <option value="">Select a country</option>
+            <option value="us">United States</option>
+            <option value="uk">United Kingdom</option>
+            <option value="ca">Canada</option>
+        </select>
+        
+        <label>
+            <input type="checkbox" id="subscribe" name="subscribe">
+            Subscribe to newsletter
+        </label>
+        
+        <label>
+            <input type="radio" name="option" value="option1" checked>
+            Option 1
+        </label>
+        <label>
+            <input type="radio" name="option" value="option2">
+            Option 2
+        </label>
+        
+        <button type="submit">Submit Form</button>
+        <button type="button" id="clear-btn">Clear</button>
+    </form>
+    
+    <div>
+        <button id="hover-btn">Hover over me</button>
+    </div>
+    
+    <div class="draggable" id="source">Drag me</div>
+    <div id="target">Drop here</div>
+    
+    <script>
+        document.getElementById('hover-btn').addEventListener('mouseenter', function() {
+            this.textContent = 'Hovered!';
+        });
+    </script>
+</body>
+</html>
+

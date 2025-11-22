@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Handling and Debugging</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Error Handling and Debugging</h1>
+    <p>This page is used for testing error handling and debugging features.</p>
+    
+    <button onclick="console.log('Console message from button click')">Log to Console</button>
+    <button onclick="throwError()">Throw Error</button>
+    
+    <script>
+        function throwError() {
+            throw new Error('Test error for debugging');
+        }
+        
+        console.log('Page loaded');
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Downloads</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>File Downloads Test Page</h1>
+    
+    <div>
+        <a href="test-file.txt" download="test-file.txt">
+            <button>Download Text File</button>
+        </a>
+    </div>
+    
+    <div>
+        <h2>File Upload</h2>
+        <input type="file" id="file-input">
+        <button onclick="document.getElementById('file-input').click()">Upload File</button>
+    </div>
+    
+    <script>
+        // Create a downloadable file dynamically
+        function createDownloadFile() {
+            const content = 'Hello World\nThis is a test file for Playwright downloads.';
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'test-file.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
+

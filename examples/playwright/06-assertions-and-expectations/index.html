@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assertions and Expectations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .box {
+            padding: 20px;
+            margin: 10px 0;
+            border: 2px solid #3498db;
+        }
+        .hidden {
+            display: none;
+        }
+        input {
+            padding: 8px;
+            margin: 10px 0;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Assertions and Expectations Test Page</h1>
+    
+    <div class="box" id="visible-box">
+        <h2>Visible Element</h2>
+        <p>This element is visible.</p>
+    </div>
+    
+    <div class="box hidden" id="hidden-box">
+        <h2>Hidden Element</h2>
+        <p>This element is hidden.</p>
+    </div>
+    
+    <div>
+        <input type="text" id="test-input" value="Test Value">
+    </div>
+    
+    <div>
+        <button id="test-btn">Test Button</button>
+    </div>
+    
+    <div>
+        <a href="#section1" id="test-link">Test Link</a>
+    </div>
+    
+    <div id="section1">
+        <h2>Section 1</h2>
+        <p>Content for assertions.</p>
+    </div>
+</body>
+</html>
+
