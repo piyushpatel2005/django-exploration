@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPA Login - Parameterized Tests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        label {
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .dashboard {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .role-admin {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .role-moderator {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .role-user {
+            background: #28a745;
+            color: white;
+        }
+        
+        .role-guest {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .features {
+            margin-top: 20px;
+        }
+        
+        .features h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 3px;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .logout-btn {
+            margin-top: 20px;
+            background: #6c757d;
+        }
+        
+        .logout-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="loginForm" class="login-form">
+            <h1>Welcome Back</h1>
+            <div id="errorMessage" class="error-message"></div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" />
+            </div>
+            <button type="button" onclick="login()">Login</button>
+        </div>
+        
+        <!-- Dashboard (shown after login) -->
+        <div id="dashboard" class="dashboard">
+            <div class="user-info">
+                <h2>Welcome, <span id="userName"></span>!</h2>
+                <p>Email: <span id="userEmail"></span></p>
+                <div>
+                    <span class="role-badge" id="roleBadge"></span>
+                </div>
+            </div>
+            
+            <div class="features">
+                <h3>Available Features:</h3>
+                <ul class="feature-list" id="featureList"></ul>
+            </div>
+            
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <script>
+        // User database (simulated)
+        const users = {
+            'admin': {
+                username: 'admin',
+                password: 'admin123',
+                email: 'admin@example.com',
+                role: 'admin',
+                features: ['View Dashboard', 'Manage Users', 'Delete Content', 'Moderate Comments', 'Access Reports', 'System Settings']
+            },
+            'moderator': {
+                username: 'moderator',
+                password: 'mod123',
+                email: 'moderator@example.com',
+                role: 'moderator',
+                features: ['View Dashboard', 'Moderate Comments', 'Edit Content', 'Access Reports']
+            },
+            'user': {
+                username: 'user',
+                password: 'user123',
+                email: 'user@example.com',
+                role: 'user',
+                features: ['View Dashboard', 'Create Posts', 'Edit Own Posts', 'View Profile']
+            },
+            'guest': {
+                username: 'guest',
+                password: 'guest123',
+                email: 'guest@example.com',
+                role: 'guest',
+                features: ['View Dashboard', 'Browse Content']
+            }
+        };
+        
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Hide error message
+            errorMessage.classList.remove('show');
+            
+            // Validate input
+            if (!username || !password) {
+                errorMessage.textContent = 'Please enter both username and password';
+                errorMessage.classList.add('show');
+                return;
+            }
+            
+            // Check credentials
+            const user = users[username.toLowerCase()];
+            if (!user || user.password !== password) {
+                errorMessage.textContent = 'Invalid username or password';
+                errorMessage.classList.add('show');
+                return;
+            }
+            
+            // Simulate SPA navigation (no page reload)
+            showDashboard(user);
+        }
+        
+        function showDashboard(user) {
+            // Hide login form
+            document.getElementById('loginForm').style.display = 'none';
+            
+            // Show dashboard
+            const dashboard = document.getElementById('dashboard');
+            dashboard.classList.add('active');
+            
+            // Update user info
+            document.getElementById('userName').textContent = user.username;
+            document.getElementById('userEmail').textContent = user.email;
+            
+            // Update role badge
+            const roleBadge = document.getElementById('roleBadge');
+            roleBadge.textContent = user.role.toUpperCase();
+            roleBadge.className = 'role-badge role-' + user.role;
+            
+            // Update features list
+            const featureList = document.getElementById('featureList');
+            featureList.innerHTML = '';
+            user.features.forEach(feature => {
+                const li = document.createElement('li');
+                li.textContent = feature;
+                featureList.appendChild(li);
+            });
+            
+            // Store user in sessionStorage for SPA state
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+        }
+        
+        function logout() {
+            // Clear session
+            sessionStorage.removeItem('currentUser');
+            
+            // Hide dashboard
+            document.getElementById('dashboard').classList.remove('active');
+            
+            // Show login form
+            document.getElementById('loginForm').style.display = 'flex';
+            
+            // Clear form
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+        
+        // Check if user is already logged in (SPA state persistence)
+        window.addEventListener('DOMContentLoaded', () => {
+            const storedUser = sessionStorage.getItem('currentUser');
+            if (storedUser) {
+                const user = JSON.parse(storedUser);
+                showDashboard(user);
+            }
+        });
+        
+        // Allow Enter key to submit login
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
+

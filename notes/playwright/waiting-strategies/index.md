@@ -18,6 +18,7 @@ Playwright automatically waits for elements to be:
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -25,15 +26,23 @@ def get_file_url(filename="index.html"):
 
 def test_auto_wait():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Playwright automatically waits for the element to be ready
-        heading = page.locator("h1")
-        print(f"✓ Auto-waited for element: {heading.text_content()}")
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Playwright automatically waits for the element to be ready
+            heading = page.locator("h1")
+            print(f"✓ Auto-waited for element: {heading.text_content()}")
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_auto_wait()
@@ -48,6 +57,7 @@ Wait for a specific selector to appear:
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -55,15 +65,23 @@ def get_file_url(filename="index.html"):
 
 def test_wait_for_selector():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Wait for element to appear
-        page.wait_for_selector("h1", state="visible")
-        print("✓ Element is visible")
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Wait for element to appear
+            page.wait_for_selector("h1", state="visible")
+            print("✓ Element is visible")
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_wait_for_selector()
@@ -76,6 +94,7 @@ Wait for the page to reach a specific load state:
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -83,18 +102,26 @@ def get_file_url(filename="index.html"):
 
 def test_wait_for_load_state():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        
-        # Navigate and wait for load
-        page.goto(get_file_url(), wait_until="load")
-        print("✓ Page loaded")
-        
-        # Wait for network to be idle
-        page.wait_for_load_state("networkidle")
-        print("✓ Network idle")
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            
+            # Navigate and wait for load
+            page.goto(get_file_url(), wait_until="load")
+            print("✓ Page loaded")
+            
+            # Wait for network to be idle
+            page.wait_for_load_state("networkidle")
+            print("✓ Network idle")
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_wait_for_load_state()
@@ -107,6 +134,7 @@ Wait for a specific duration (use sparingly):
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -114,15 +142,23 @@ def get_file_url(filename="index.html"):
 
 def test_wait_for_timeout():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Wait for 1 second
-        page.wait_for_timeout(1000)
-        print("✓ Waited for timeout")
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Wait for 1 second
+            page.wait_for_timeout(1000)
+            print("✓ Waited for timeout")
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_wait_for_timeout()
@@ -137,6 +173,7 @@ Wait for network requests to complete:
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -144,16 +181,24 @@ def get_file_url(filename="index.html"):
 
 def test_wait_for_network():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        
-        # Navigate to page
-        page.goto(get_file_url())
-        
-        # Note: For local file URLs, network requests are minimal
-        # This example shows the pattern for web URLs
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            
+            # Navigate to page
+            page.goto(get_file_url())
+            
+            # Note: For local file URLs, network requests are minimal
+            # This example shows the pattern for web URLs
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_wait_for_network()
@@ -166,6 +211,7 @@ Wait for page navigation:
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -173,19 +219,67 @@ def get_file_url(filename="index.html"):
 
 def test_wait_for_navigation():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Wait for navigation after click (if link navigates)
-        # Note: For local file URLs, navigation may not occur
-        # This example shows the pattern for web URLs
-        page.locator("h1").click()
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Wait for navigation after click (if link navigates)
+            # Note: For local file URLs, navigation may not occur
+            # This example shows the pattern for web URLs
+            page.locator("h1").click()
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_wait_for_navigation()
+```
+
+## Waiting for Dynamic Content
+
+Wait for content that loads dynamically:
+
+```python
+from playwright.sync_api import sync_playwright
+from pathlib import Path
+import sys
+
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
+
+def test_wait_for_dynamic_content():
+    with sync_playwright() as p:
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Click button to load dynamic content
+            page.click("#load-btn")
+            
+            # Wait for dynamic content to appear
+            page.wait_for_selector("#dynamic-content", state="visible")
+            print("✓ Dynamic content loaded")
+        finally:
+            if browser:
+                browser.close()
+
+if __name__ == "__main__":
+    test_wait_for_dynamic_content()
 ```
 
 ## Waiting for Element States
@@ -195,6 +289,7 @@ Wait for specific element states:
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -202,17 +297,25 @@ def get_file_url(filename="index.html"):
 
 def test_wait_for_element_state():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        element = page.locator("h1")
-        
-        # Wait for element to be visible
-        element.wait_for(state="visible")
-        print("✓ Element is visible")
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            element = page.locator("h1")
+            
+            # Wait for element to be visible
+            element.wait_for(state="visible")
+            print("✓ Element is visible")
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_wait_for_element_state()
@@ -225,6 +328,7 @@ Create custom wait conditions:
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 import time
 
 def get_file_url(filename="index.html"):
@@ -233,21 +337,29 @@ def get_file_url(filename="index.html"):
 
 def test_custom_wait():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Custom wait function
-        def wait_for_custom_condition():
-            for _ in range(10):  # Try 10 times
-                if page.locator("h1").count() > 0:
-                    return True
-                time.sleep(0.5)
-            return False
-        
-        wait_for_custom_condition()
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Custom wait function
+            def wait_for_custom_condition():
+                for _ in range(10):  # Try 10 times
+                    if page.locator("h1").count() > 0:
+                        return True
+                    time.sleep(0.5)
+                return False
+            
+            wait_for_custom_condition()
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_custom_wait()
@@ -260,6 +372,7 @@ Set timeouts globally or per action:
 ```python
 from playwright.sync_api import sync_playwright
 from pathlib import Path
+import sys
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -267,22 +380,29 @@ def get_file_url(filename="index.html"):
 
 def test_timeout_config():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        
-        # Create context with timeout
-        context = browser.new_context()
-        context.set_default_timeout(30000)  # 30 seconds
-        
-        page = context.new_page()
-        
-        # Set timeout for specific action
-        page.goto(get_file_url(), timeout=60000)
-        
-        # Set timeout for locator
-        element = page.locator("h1")
-        element.click(timeout=10000)
-        
-        browser.close()
+        browser = None
+        try:
+            # Use Firefox on macOS to avoid Chromium crashes
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
+            # Create context with timeout
+            context = browser.new_context()
+            context.set_default_timeout(30000)  # 30 seconds
+            
+            page = context.new_page()
+            
+            # Set timeout for specific action
+            page.goto(get_file_url(), timeout=60000)
+            
+            # Set timeout for locator
+            element = page.locator("h1")
+            element.click(timeout=10000)
+        finally:
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     test_timeout_config()
@@ -368,6 +488,8 @@ Here's the HTML page (`index.html`) used in the examples above:
 3. **Use `wait_for_load_state()`**: For page-level waits
 4. **Wait for specific conditions**: Instead of fixed timeouts
 5. **Set appropriate timeouts**: Balance between speed and reliability
+6. **Platform-specific handling**: On macOS, use Firefox to avoid Chromium crashes
+7. **Use try/finally**: Always ensure browser cleanup with try/finally blocks
 
 ## Common Wait Patterns
 

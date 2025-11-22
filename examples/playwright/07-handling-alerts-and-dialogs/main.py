@@ -11,8 +11,14 @@ def get_file_url(filename="index.html"):
 def test_alert():
     """Demonstrate handling alert dialogs."""
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+        browser = None
         try:
+            # Use Firefox on macOS to avoid Chromium crashes with dialogs
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
             page = browser.new_page()
             page.goto(get_file_url())
             
@@ -36,13 +42,20 @@ def test_alert():
             if dialog_handled:
                 print("✓ Alert handled successfully")
         finally:
-            browser.close()
+            if browser:
+                browser.close()
 
 def test_confirm():
     """Demonstrate handling confirm dialogs."""
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+        browser = None
         try:
+            # Use Firefox on macOS to avoid Chromium crashes with dialogs
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
             page = browser.new_page()
             page.goto(get_file_url())
             
@@ -62,13 +75,20 @@ def test_confirm():
             if dialog_handled:
                 print("✓ Confirm handled successfully")
         finally:
-            browser.close()
+            if browser:
+                browser.close()
 
 def test_prompt():
     """Demonstrate handling prompt dialogs."""
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+        browser = None
         try:
+            # Use Firefox on macOS to avoid Chromium crashes with dialogs
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
             page = browser.new_page()
             page.goto(get_file_url())
             
@@ -88,19 +108,21 @@ def test_prompt():
             if dialog_handled:
                 print("✓ Prompt handled successfully")
         finally:
-            browser.close()
+            if browser:
+                browser.close()
 
 def test_dialog_info():
     """Demonstrate getting dialog information."""
     with sync_playwright() as p:
-        # Use Firefox on macOS to avoid Chromium crashes with dialogs
-        # Chromium on macOS has known issues with dialog handling after multiple dialogs
-        if sys.platform == "darwin":  # macOS
-            browser = p.firefox.launch(headless=True)
-        else:
-            browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        
+        browser = None
         try:
+            # Use Firefox on macOS to avoid Chromium crashes with dialogs
+            # Chromium on macOS has known issues with dialog handling after multiple dialogs
+            if sys.platform == "darwin":  # macOS
+                browser = p.firefox.launch(headless=True)
+            else:
+                browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
+            
             page = browser.new_page()
             page.goto(get_file_url())
             
@@ -120,8 +142,8 @@ def test_dialog_info():
                 print(f"✓ Dialog type: {dialog_info.get('type')}")
                 print(f"✓ Dialog message: {dialog_info.get('message')}")
         finally:
-            browser.close()
-            time.sleep(0.2)  # Ensure browser is fully closed
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     print("Testing alert dialogs...")

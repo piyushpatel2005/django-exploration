@@ -57,8 +57,16 @@ def run_pytest_tests():
     print("Running pytest tests")
     print("=" * 70)
     
-    # Find all test files
-    test_files = sorted(base_dir.glob("**/test_*.py"))
+    # Find all test files, excluding virtual environment directories
+    test_files = []
+    for test_file in base_dir.glob("**/test_*.py"):
+        # Skip files in virtual environment directories
+        parts = test_file.parts
+        if any(part in ('.env', 'venv', '.venv', '__pycache__', 'site-packages') for part in parts):
+            continue
+        test_files.append(test_file)
+    
+    test_files = sorted(test_files)
     
     if not test_files:
         print("No pytest test files found.")

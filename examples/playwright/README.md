@@ -48,7 +48,7 @@ pytest
 
 # Run tests in a specific directory
 pytest 14-test-organization-with-pytest/
-pytest 22-pytest-integration/
+pytest 22-parameterized-spa-login-tests/
 
 # Run with verbose output
 pytest -v
@@ -97,7 +97,6 @@ done
 - `12-network-interception/` - Network mocking
 - `13-file-downloads/` - File downloads
 - `14-test-organization-with-pytest/` - Pytest organization
-- `22-pytest-integration/` - Pytest integration and running tests
 - `15-page-object-model/` - Page Object Model pattern
 - `16-parallel-execution/` - Parallel test execution
 - `17-configuration-and-options/` - Configuration
@@ -105,6 +104,7 @@ done
 - `19-cicd-integration/` - CI/CD integration
 - `20-advanced-scenarios/` - Advanced scenarios
 - `21-best-practices/` - Best practices
+- `22-parameterized-spa-login-tests/` - Parameterized SPA login tests with multiple user roles
 
 ## Notes
 
