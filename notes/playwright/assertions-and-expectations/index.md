@@ -167,6 +167,7 @@ if __name__ == "__main__":
 ```python
 from playwright.sync_api import sync_playwright, expect
 from pathlib import Path
+import re
 
 def get_file_url(filename="index.html"):
     html_file = Path(__file__).parent / filename
@@ -179,11 +180,13 @@ def test_url_assertions():
         file_url = get_file_url()
         page.goto(file_url)
         
-        # Check URL contains file path
-        expect(page).to_have_url(r".*index\.html.*")
+        # Check URL contains file path using regex
+        expect(page).to_have_url(re.compile(r".*index\.html.*"))
+        print("✓ URL matches")
         
         # Check title
         expect(page).to_have_title("Assertions and Expectations")
+        print("✓ Title matches")
         
         browser.close()
 
@@ -195,6 +198,11 @@ if __name__ == "__main__":
 
 ```python
 from playwright.sync_api import sync_playwright, expect
+from pathlib import Path
+
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_count_assertions():
     with sync_playwright() as p:
@@ -204,11 +212,11 @@ def test_count_assertions():
         
         links = page.locator("a")
         
-        # Check count
-        expect(links).to_have_count(2)
-        
-        # Check count is greater than
-        expect(links).to_have_count(lambda count: count > 0)
+        # Check count is greater than 0
+        # Note: to_have_count can accept a callable, but for simplicity, we check the actual count
+        link_count = links.count()
+        assert link_count > 0, f"Expected at least 1 link, but found {link_count}"
+        print(f"✓ Found {link_count} links")
         
         browser.close()
 

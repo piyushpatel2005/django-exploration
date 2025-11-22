@@ -1,5 +1,6 @@
 from playwright.sync_api import sync_playwright, expect
 from pathlib import Path
+import re
 
 def get_file_url(filename="index.html"):
     """Helper function to get file URL."""
@@ -47,8 +48,8 @@ def test_url_assertions():
         file_url = get_file_url()
         page.goto(file_url)
         
-        # Check URL contains file path
-        expect(page).to_have_url(lambda url: "index.html" in url)
+        # Check URL contains file path using regex
+        expect(page).to_have_url(re.compile(r".*index\.html.*"))
         print("✓ URL matches")
         
         # Check title
@@ -67,8 +68,10 @@ def test_count_assertions():
         links = page.locator("a")
         
         # Check count is greater than 0
-        expect(links).to_have_count(lambda count: count > 0)
-        print(f"✓ Found {links.count()} links")
+        # Note: to_have_count can accept a callable, but for simplicity, we check the actual count
+        link_count = links.count()
+        assert link_count > 0, f"Expected at least 1 link, but found {link_count}"
+        print(f"✓ Found {link_count} links")
         
         browser.close()
 

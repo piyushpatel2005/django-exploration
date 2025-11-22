@@ -48,6 +48,7 @@ pytest
 
 # Run tests in a specific directory
 pytest 14-test-organization-with-pytest/
+pytest 22-pytest-integration/
 
 # Run with verbose output
 pytest -v
@@ -96,6 +97,7 @@ done
 - `12-network-interception/` - Network mocking
 - `13-file-downloads/` - File downloads
 - `14-test-organization-with-pytest/` - Pytest organization
+- `22-pytest-integration/` - Pytest integration and running tests
 - `15-page-object-model/` - Page Object Model pattern
 - `16-parallel-execution/` - Parallel test execution
 - `17-configuration-and-options/` - Configuration

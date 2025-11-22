@@ -25,30 +25,31 @@ def get_file_url(filename="index.html"):
 def test_alert():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Listen for alert dialog
-        page.on("dialog", lambda dialog: dialog.accept())
-        
-        # Listen for alert dialog
-        dialog_handled = False
-        def handle_dialog(dialog):
-            nonlocal dialog_handled
-            print(f"✓ Alert dialog: {dialog.message}")
-            dialog.accept()
-            dialog_handled = True
-        
-        page.on("dialog", handle_dialog)
-        
-        # Trigger alert
-        page.click("button:has-text('Show Alert')")
-        page.wait_for_timeout(500)
-        
-        if dialog_handled:
-            print("✓ Alert handled successfully")
-        
-        browser.close()
+        try:
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Set up dialog handler BEFORE clicking
+            dialog_handled = False
+            def handle_dialog(dialog):
+                nonlocal dialog_handled
+                print(f"✓ Alert dialog: {dialog.message}")
+                dialog.accept()
+                dialog_handled = True
+            
+            # Register handler before triggering
+            page.on("dialog", handle_dialog)
+            
+            # Now trigger the alert
+            page.click("button:has-text('Show Alert')")
+            
+            # Small wait to ensure dialog is handled
+            page.wait_for_timeout(200)
+            
+            if dialog_handled:
+                print("✓ Alert handled successfully")
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
     test_alert()
@@ -60,22 +61,36 @@ Handle confirm dialogs (OK/Cancel):
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_confirm():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Accept confirm dialog
-        page.on("dialog", lambda dialog: dialog.accept())
-        page.evaluate("confirm('Are you sure?')")
-        
-        # Or dismiss
-        page.on("dialog", lambda dialog: dialog.dismiss())
-        page.evaluate("confirm('Are you sure?')")
-        
-        browser.close()
+        try:
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Set up dialog handler before triggering
+            dialog_handled = False
+            def handle_dialog(dialog):
+                nonlocal dialog_handled
+                print(f"✓ Confirm dialog: {dialog.message}")
+                dialog.accept()  # Or use dialog.dismiss() to cancel
+                dialog_handled = True
+            
+            # Register handler before triggering
+            page.on("dialog", handle_dialog)
+            page.click("button:has-text('Show Confirm')")
+            page.wait_for_timeout(200)
+            
+            if dialog_handled:
+                print("✓ Confirm handled successfully")
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
     test_confirm()
@@ -87,52 +102,76 @@ Handle prompt dialogs with input:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_prompt():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Handle prompt with input
-        page.on("dialog", lambda dialog: dialog.accept("John Doe"))
-        result = page.evaluate("prompt('What is your name?')")
-        print(f"Result: {result}")
-        
-        browser.close()
+        try:
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Set up dialog handler before triggering
+            dialog_handled = False
+            def handle_dialog(dialog):
+                nonlocal dialog_handled
+                print(f"✓ Prompt dialog: {dialog.message}")
+                dialog.accept("John Doe")  # Provide input value
+                dialog_handled = True
+            
+            # Register handler before triggering
+            page.on("dialog", handle_dialog)
+            page.click("button:has-text('Show Prompt')")
+            page.wait_for_timeout(200)
+            
+            if dialog_handled:
+                print("✓ Prompt handled successfully")
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
     test_prompt()
 ```
 
-## Using `page.wait_for_event()`
+## Important: Handler Setup Order
 
-A better approach is to wait for the dialog event:
+**Always set up the dialog handler BEFORE triggering the dialog.** This ensures the handler is ready when the dialog appears:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
 
-def test_dialog_wait():
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
+
+def test_handler_order():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
-        
-        # Wait for dialog and handle it
-        def handle_dialog(dialog):
-            print(f"Dialog message: {dialog.message}")
-            print(f"Dialog type: {dialog.type}")
-            dialog.accept()
-        
-        page.on("dialog", handle_dialog)
-        
-        # Trigger dialog
-        page.evaluate("alert('Test alert')")
-        
-        browser.close()
+        try:
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Step 1: Set up handler FIRST
+            def handle_dialog(dialog):
+                print(f"Dialog message: {dialog.message}")
+                print(f"Dialog type: {dialog.type}")
+                dialog.accept()
+            
+            page.on("dialog", handle_dialog)
+            
+            # Step 2: THEN trigger the dialog
+            page.click("button:has-text('Show Alert')")
+            page.wait_for_timeout(200)
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
-    test_dialog_wait()
+    test_handler_order()
 ```
 
 ## Dialog Information
@@ -141,56 +180,76 @@ Get information from dialogs:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+import time
+import sys
+
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_dialog_info():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        page.goto(get_file_url())
+        # Use Firefox on macOS to avoid Chromium crashes with dialogs
+        # Chromium on macOS has known issues with dialog handling after multiple dialogs
+        if sys.platform == "darwin":  # macOS
+            browser = p.firefox.launch(headless=True)
+        else:
+            browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         
-        dialog_messages = []
-        
-        def handle_dialog(dialog):
-            dialog_messages.append({
-                "message": dialog.message,
-                "type": dialog.type,
-                "default_value": dialog.default_value
-            })
-            dialog.accept()
-        
-        page.on("dialog", handle_dialog)
-        page.evaluate("alert('Hello World')")
-        
-        print(f"Dialog info: {dialog_messages}")
-        
-        browser.close()
+        try:
+            page = browser.new_page()
+            page.goto(get_file_url())
+            
+            # Set up dialog handler to capture information
+            dialog_info = {}
+            def handle_dialog(dialog):
+                dialog_info["type"] = dialog.type
+                dialog_info["message"] = dialog.message
+                dialog.accept()
+            
+            # Register handler before triggering
+            page.on("dialog", handle_dialog)
+            page.click("button:has-text('Show Alert')")
+            page.wait_for_timeout(200)
+            
+            if dialog_info:
+                print(f"✓ Dialog type: {dialog_info.get('type')}")
+                print(f"✓ Dialog message: {dialog_info.get('message')}")
+        finally:
+            browser.close()
+            time.sleep(0.2)  # Ensure browser is fully closed
 
 if __name__ == "__main__":
     test_dialog_info()
 ```
 
-## Before Dialog Handler
+## macOS Compatibility Note
 
-Handle dialogs before they appear:
+**Important for macOS users**: Chromium on macOS has known issues with dialog handling, especially after handling multiple dialogs. If you encounter crashes:
 
-```python
-from playwright.sync_api import sync_playwright
+1. **Use Firefox or WebKit** for dialog tests:
+   ```python
+   browser = p.firefox.launch(headless=True)  # More stable on macOS
+   # or
+   browser = p.webkit.launch(headless=True)
+   ```
 
-def test_before_dialog():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
-        page = browser.new_page()
-        
-        # Set up dialog handler before navigation
-        page.on("dialog", lambda dialog: dialog.accept())
-        
-        page.goto(get_file_url())
-        
-        browser.close()
+2. **Add delays between tests** when running multiple dialog tests:
+   ```python
+   import time
+   test_alert()
+   time.sleep(0.5)  # Delay between tests
+   test_confirm()
+   ```
 
-if __name__ == "__main__":
-    test_before_dialog()
-```
+3. **Use try/finally blocks** to ensure proper cleanup:
+   ```python
+   try:
+       # test code
+   finally:
+       browser.close()
+   ```
 
 ## File Upload Dialogs
 
@@ -223,28 +282,46 @@ if __name__ == "__main__":
 
 ## Best Practices
 
-1. **Set up handlers before actions**: Register dialog handlers before triggering dialogs
-2. **Use `wait_for_event()`**: For more control over dialog handling
+1. **Set up handlers before actions**: Register dialog handlers BEFORE clicking buttons that trigger dialogs
+2. **Use try/finally blocks**: Ensure browser cleanup even if errors occur
 3. **Handle all dialog types**: Alert, confirm, and prompt
 4. **Verify dialog messages**: Check that the correct dialog appeared
-5. **Clean up handlers**: Remove handlers when done to avoid interference
+5. **Add small delays**: Use `wait_for_timeout(200)` after triggering dialogs to ensure they're handled
+6. **macOS compatibility**: Use Firefox or WebKit for dialog tests on macOS to avoid Chromium crashes
+7. **Add delays between tests**: When running multiple dialog tests, add delays between them
 
 ## Common Patterns
 
 ```python
-# Pattern 1: Simple accept
-page.on("dialog", lambda dialog: dialog.accept())
+# Pattern 1: Simple accept with handler
+def handle_dialog(dialog):
+    print(f"Dialog: {dialog.message}")
+    dialog.accept()
+
+page.on("dialog", handle_dialog)
+page.click("button")
 
 # Pattern 2: Accept with message check
-page.on("dialog", lambda dialog: 
-    dialog.accept() if "confirm" in dialog.message.lower() else dialog.dismiss()
-)
+def handle_dialog(dialog):
+    if "confirm" in dialog.message.lower():
+        dialog.accept()
+    else:
+        dialog.dismiss()
 
-# Pattern 3: Wait for specific dialog
-with page.expect_dialog() as dialog_info:
-    page.click("button")
-dialog = dialog_info.value
-dialog.accept()
+page.on("dialog", handle_dialog)
+page.click("button")
+
+# Pattern 3: Capture dialog information
+dialog_info = {}
+def handle_dialog(dialog):
+    dialog_info["message"] = dialog.message
+    dialog_info["type"] = dialog.type
+    dialog.accept()
+
+page.on("dialog", handle_dialog)
+page.click("button")
+page.wait_for_timeout(200)
+print(f"Dialog info: {dialog_info}")
 ```
 
 ## HTML Page for Testing

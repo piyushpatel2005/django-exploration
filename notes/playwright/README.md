@@ -20,6 +20,7 @@ This is a comprehensive set of Playwright tutorials covering UI testing with Pyt
 - [Network Interception](network-interception/index.md)
 - [File Downloads](file-downloads/index.md)
 - [Test Organization with Pytest](test-organization-with-pytest/index.md)
+- [Pytest Integration](pytest-integration/index.md)
 - [Page Object Model (POM)](page-object-model/index.md)
 - [Parallel Execution](parallel-execution/index.md)
 - [Configuration and Options](configuration-and-options/index.md)
