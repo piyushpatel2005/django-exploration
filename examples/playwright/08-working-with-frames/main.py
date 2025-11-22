@@ -30,22 +30,21 @@ def test_frame_interaction():
         page = browser.new_page()
         page.goto(get_file_url())
         
-        # Wait for frame to load
-        frame_element = page.locator("iframe")
-        frame_element.wait_for(state="attached")
+        # Wait for page to load frames
+        page.wait_for_load_state("load")
         
-        # Get frame content
-        frame = frame_element.content_frame()
+        # Use frame_locator to access frame content
+        # frame_locator returns a FrameLocator that can locate elements inside the frame
+        frame_locator = page.frame_locator("iframe").first
         
-        if frame:
-            # Interact with elements inside frame
-            heading = frame.locator("h1")
-            if heading.count() > 0:
-                print(f"✓ Frame heading: {heading.first.text_content()}")
-            
-            button = frame.locator("button")
-            if button.count() > 0:
-                print(f"✓ Found button in frame")
+        # Interact with elements inside frame using frame_locator
+        heading = frame_locator.locator("h1")
+        if heading.count() > 0:
+            print(f"✓ Frame heading: {heading.first.text_content()}")
+        
+        button = frame_locator.locator("button")
+        if button.count() > 0:
+            print(f"✓ Found button in frame")
         
         browser.close()
 

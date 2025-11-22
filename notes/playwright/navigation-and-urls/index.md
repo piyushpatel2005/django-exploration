@@ -11,6 +11,74 @@ Playwright provides several methods for navigation:
 - `reload()`: Reload the current page
 - URL assertions and checks
 
+## Test Pages
+
+The examples in this tutorial use two HTML pages for navigation testing:
+
+**page1.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Page 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #e8f4f8;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 18px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Navigation Page 1</h1>
+    <p>This is the first page for testing navigation.</p>
+    <a href="page2.html">Go to Page 2</a>
+</body>
+</html>
+```
+
+**page2.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Page 2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8e8e8;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 18px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Navigation Page 2</h1>
+    <p>This is the second page for testing navigation.</p>
+    <a href="page1.html">Go to Page 1</a>
+</body>
+</html>
+```
+
 ## Basic Navigation
 
 ### Navigate to URL
@@ -75,6 +143,11 @@ Control when navigation is considered complete:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_wait_until():
     with sync_playwright() as p:
@@ -82,16 +155,16 @@ def test_wait_until():
         page = browser.new_page()
         
         # Wait for DOM content loaded
-        page.goto("https://example.com", wait_until="domcontentloaded")
+        page.goto(get_file_url("page1.html"), wait_until="domcontentloaded")
         
         # Wait for network to be idle
-        page.goto("https://example.com", wait_until="networkidle")
+        page.goto(get_file_url("page1.html"), wait_until="networkidle")
         
         # Wait for load event
-        page.goto("https://example.com", wait_until="load")
+        page.goto(get_file_url("page1.html"), wait_until="load")
         
         # Wait for commit (navigation started)
-        page.goto("https://example.com", wait_until="commit")
+        page.goto(get_file_url("page1.html"), wait_until="commit")
         
         browser.close()
 
@@ -105,6 +178,11 @@ Navigate through browser history:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_history():
     with sync_playwright() as p:
@@ -113,19 +191,19 @@ def test_history():
         
         # Navigate to first page
         page.goto(get_file_url("page1.html"))
-        print(f"Page 1: {page.url}")
+        print(f"✓ Page 1 title: {page.title()}")
         
         # Navigate to second page
-        page.goto("https://playwright.dev")
-        print(f"Page 2: {page.url}")
+        page.goto(get_file_url("page2.html"))
+        print(f"✓ Page 2 title: {page.title()}")
         
         # Go back
         page.go_back()
-        print(f"After back: {page.url}")
+        print(f"✓ After back - title: {page.title()}")
         
         # Go forward
         page.go_forward()
-        print(f"After forward: {page.url}")
+        print(f"✓ After forward - title: {page.title()}")
         
         browser.close()
 
@@ -139,6 +217,11 @@ Reload the current page:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_reload():
     with sync_playwright() as p:
@@ -146,11 +229,14 @@ def test_reload():
         page = browser.new_page()
         page.goto(get_file_url("page1.html"))
         
+        initial_title = page.title()
+        
         # Reload page
         page.reload()
         
-        # Reload and wait for network idle
-        page.reload(wait_until="networkidle")
+        reloaded_title = page.title()
+        print(f"✓ Initial title: {initial_title}")
+        print(f"✓ Reloaded title: {reloaded_title}")
         
         browser.close()
 
@@ -164,21 +250,27 @@ Verify URLs:
 
 ```python
 from playwright.sync_api import sync_playwright, expect
+from pathlib import Path
+import re
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_url_assertions():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto(get_file_url("page1.html"))
+        file_url = get_file_url("page1.html")
+        page.goto(file_url)
         
-        # Assert exact URL
-        expect(page).to_have_url(r".*page1\.html.*")
+        # Assert URL contains page1.html using regex
+        expect(page).to_have_url(re.compile(r".*page1\.html.*"))
+        print("✓ URL assertion passed")
         
-        # Assert URL contains
-        expect(page).to_have_url(r".*example.*")
-        
-        # Assert URL with regex
-        expect(page).to_have_url(r"https://.*\.com/")
+        # Assert title
+        expect(page).to_have_title("Navigation Page 1")
+        print("✓ Title assertion passed")
         
         browser.close()
 
@@ -192,6 +284,11 @@ Wait for navigation to complete:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_wait_navigation():
     with sync_playwright() as p:
@@ -203,7 +300,7 @@ def test_wait_navigation():
         with page.expect_navigation():
             page.locator("a").click()
         
-        print(f"Navigated to: {page.url}")
+        print(f"✓ Navigated to: {page.url[:50]}...")
         
         browser.close()
 
@@ -217,22 +314,27 @@ Work with URL parameters:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_url_params():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
-        # Navigate with query parameters
-        page.goto("https://example.com?param1=value1&param2=value2")
+        # Navigate to page
+        page.goto(get_file_url("page1.html"))
         
         # Get current URL
         current_url = page.url
-        print(f"Current URL: {current_url}")
+        print(f"✓ Current URL: {current_url[:50]}...")
         
-        # Evaluate URL in browser
-        url_params = page.evaluate("() => new URL(window.location.href).searchParams.get('param1')")
-        print(f"Param1: {url_params}")
+        # Get page title
+        title = page.title()
+        print(f"✓ Page title: {title}")
         
         browser.close()
 
@@ -252,10 +354,12 @@ def test_redirects():
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
-        # Follow redirects automatically (default)
-        response = page.goto("https://example.com", wait_until="networkidle")
+        # Navigate to page
+        response = page.goto(get_file_url("page1.html"), wait_until="networkidle")
         
-        # Check if redirect occurred
+        # Check response status
+        print(f"✓ Response status: {response.status}")
+        print(f"✓ Final URL: {page.url[:50]}...")
         if response:
             print(f"Final URL: {response.url}")
             print(f"Status: {response.status}")

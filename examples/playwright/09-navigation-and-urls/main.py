@@ -1,5 +1,6 @@
 from playwright.sync_api import sync_playwright, expect
 from pathlib import Path
+import re
 
 def get_file_url(filename):
     """Helper function to get file URL."""
@@ -71,8 +72,8 @@ def test_url_assertions():
         file_url = get_file_url("page1.html")
         page.goto(file_url)
         
-        # Assert URL contains page1.html
-        expect(page).to_have_url(lambda url: "page1.html" in url)
+        # Assert URL contains page1.html using regex
+        expect(page).to_have_url(re.compile(r".*page1\.html.*"))
         print("✓ URL assertion passed")
         
         # Assert title

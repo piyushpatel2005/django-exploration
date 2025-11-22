@@ -29,18 +29,18 @@ def test_clicking():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url(), wait_until="load")
-            
+        
             # Prevent form submission to avoid navigation
             page.evaluate("document.getElementById('test-form').addEventListener('submit', e => e.preventDefault())")
-            
+        
             # Click a button
             button = page.locator("button[type='submit']")
             button.wait_for(state="visible")
             button.first.click()
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -85,21 +85,21 @@ def test_typing():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url(), wait_until="domcontentloaded")
-            
+        
             # Wait for the specific input to be ready
             name_input = page.locator("input[name='name']")
             name_input.wait_for(state="visible", timeout=10000)
-            
+        
             # Click on the input first to ensure it's focused and ready
             name_input.first.click()
-            time.sleep(0.1)
-            
+        time.sleep(0.1)
+        
             # Now fill it
             name_input.first.fill("Playwright Test")
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -136,29 +136,29 @@ def test_filling_form():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url(), wait_until="domcontentloaded")
             
             # Prevent form submission to avoid navigation
             page.evaluate("document.getElementById('test-form').addEventListener('submit', e => e.preventDefault())")
-            
-            # Fill text inputs
+        
+        # Fill text inputs
             page.get_by_label("Name:").fill("John Doe")
             page.get_by_label("Email:").fill("john@example.com")
-            
-            # Select dropdown
+        
+        # Select dropdown
             page.select_option("select#country", "us")
-            
-            # Check checkbox
+        
+        # Check checkbox
             page.get_by_label("Subscribe to newsletter").check()
-            
-            # Select radio button
-            page.get_by_label("Option 1").check()
-            
-            # Submit form
-            page.locator("button[type='submit']").click()
+        
+        # Select radio button
+        page.get_by_label("Option 1").check()
+        
+        # Submit form
+        page.locator("button[type='submit']").click()
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -182,19 +182,19 @@ def test_select_dropdown():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url())
-            
-            # Select by value
-            page.select_option("select#country", value="us")
-            
-            # Select by label
-            page.select_option("select#country", label="United States")
-            
-            # Select by index
+        
+        # Select by value
+        page.select_option("select#country", value="us")
+        
+        # Select by label
+        page.select_option("select#country", label="United States")
+        
+        # Select by index
             page.select_option("select#country", index=1)  # Skip first empty option
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -218,22 +218,22 @@ def test_checkboxes_radio():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url())
-            
-            # Check a checkbox
-            page.get_by_label("Subscribe to newsletter").check()
-            
-            # Uncheck a checkbox
-            page.get_by_label("Subscribe to newsletter").uncheck()
-            
-            # Check if checked
+        
+        # Check a checkbox
+        page.get_by_label("Subscribe to newsletter").check()
+        
+        # Uncheck a checkbox
+        page.get_by_label("Subscribe to newsletter").uncheck()
+        
+        # Check if checked
             is_checked = page.get_by_label("Subscribe to newsletter").is_checked()
-            
-            # Select radio button
-            page.get_by_label("Option 1").check()
+        
+        # Select radio button
+        page.get_by_label("Option 1").check()
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -257,29 +257,29 @@ def test_keyboard():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url(), wait_until="domcontentloaded")
-            
+        
             # Wait for the specific input to be ready
             email_input = page.locator("input[name='email']")
             email_input.wait_for(state="visible", timeout=10000)
-            
+        
             # Click on the input first to ensure it's focused and ready
             email_input.first.click()
-            time.sleep(0.1)
-            
+        time.sleep(0.1)
+        
             # Now use keyboard to type
             page.keyboard.type("test@example.com")
-            
-            # Keyboard shortcuts
-            page.keyboard.press("Control+A")  # Select all
-            page.keyboard.press("Control+C")  # Copy
-            page.keyboard.press("Control+V")  # Paste
-            
-            # On Mac, use "Meta" instead of "Control"
-            page.keyboard.press("Meta+A")
+        
+        # Keyboard shortcuts
+        page.keyboard.press("Control+A")  # Select all
+        page.keyboard.press("Control+C")  # Copy
+        page.keyboard.press("Control+V")  # Paste
+        
+        # On Mac, use "Meta" instead of "Control"
+        page.keyboard.press("Meta+A")
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -303,22 +303,22 @@ def test_mouse_actions():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url(), wait_until="load")
-            
-            # Hover over an element
+        
+        # Hover over an element
             hover_btn = page.locator("#hover-btn")
             hover_btn.wait_for(state="visible")
             hover_btn.first.hover()
-            
-            # Drag and drop
-            source = page.locator("#source")
-            target = page.locator("#target")
-            source.wait_for(state="visible")
-            target.wait_for(state="visible")
+        
+        # Drag and drop
+        source = page.locator("#source")
+        target = page.locator("#target")
+        source.wait_for(state="visible")
+        target.wait_for(state="visible")
             source.first.drag_to(target.first)
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -342,21 +342,21 @@ def test_file_upload():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url())
-            
+        
             # Upload a file (if file input exists on page)
-            file_input = page.locator("input[type='file']")
+        file_input = page.locator("input[type='file']")
             if file_input.count() > 0:
-                file_input.set_input_files("path/to/file.pdf")
-                
-                # Upload multiple files
-                file_input.set_input_files([
-                    "path/to/file1.pdf",
-                    "path/to/file2.pdf"
-                ])
+        file_input.set_input_files("path/to/file.pdf")
+        
+        # Upload multiple files
+        file_input.set_input_files([
+            "path/to/file1.pdf",
+            "path/to/file2.pdf"
+        ])
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -380,15 +380,15 @@ def test_clear_input():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url())
-            
-            # Clear an input field
+        
+        # Clear an input field
             input_field = page.locator("input[name='name']")
-            input_field.fill("")  # Method 1: Fill with empty string
-            input_field.clear()   # Method 2: Use clear method
+        input_field.fill("")  # Method 1: Fill with empty string
+        input_field.clear()   # Method 2: Use clear method
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -412,22 +412,22 @@ def test_focus_blur():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url(), wait_until="domcontentloaded")
-            
-            # Wait for input to be ready
+        
+        # Wait for input to be ready
             input_field = page.locator("input[name='name']")
-            input_field.wait_for(state="visible")
-            
-            # Focus on an element (clicking first helps ensure it's ready)
-            input_field.first.click()
-            time.sleep(0.1)
-            input_field.focus()
-            
-            # Blur (remove focus)
-            input_field.blur()
+        input_field.wait_for(state="visible")
+        
+        # Focus on an element (clicking first helps ensure it's ready)
+        input_field.first.click()
+        time.sleep(0.1)
+        input_field.focus()
+        
+        # Blur (remove focus)
+        input_field.blur()
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
@@ -451,18 +451,18 @@ def test_scroll():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         try:
-            page = browser.new_page()
+        page = browser.new_page()
             page.goto(get_file_url(), wait_until="load")
-            
-            # Scroll element into view
+        
+        # Scroll element into view
             target = page.locator("#target")
             target.wait_for(state="attached")
             target.first.scroll_into_view_if_needed()
-            
-            # Scroll page
-            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        
+        # Scroll page
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         finally:
-            browser.close()
+        browser.close()
             time.sleep(0.1)
 
 if __name__ == "__main__":
