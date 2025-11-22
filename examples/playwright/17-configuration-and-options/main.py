@@ -28,7 +28,8 @@ def test_viewport_config():
         page = context.new_page()
         page.goto(get_file_url())
         
-        viewport_size = context.viewport_size
+        # Get viewport size from the page
+        viewport_size = page.viewport_size
         print(f"✓ Viewport: {viewport_size['width']}x{viewport_size['height']}")
         
         browser.close()
