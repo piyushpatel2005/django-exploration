@@ -52,6 +52,11 @@ A page represents a single tab within a browser context. You can have multiple p
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_multiple_pages():
     with sync_playwright() as p:
@@ -63,8 +68,8 @@ def test_multiple_pages():
         page2 = context.new_page()
         
         # Navigate each page independently
-        page1.goto("https://example.com")
-        page2.goto("https://playwright.dev")
+        page1.goto(get_file_url("page1.html"))
+        page2.goto(get_file_url("page2.html"))
         
         print(f"Page 1 title: {page1.title()}")
         print(f"Page 2 title: {page2.title()}")
@@ -81,11 +86,16 @@ For simple cases, you can create a page directly from the browser (Playwright cr
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename="page1.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
     page = browser.new_page()  # Context created automatically
-    page.goto("https://example.com")
+    page.goto(get_file_url())
     browser.close()
 ```
 
@@ -95,6 +105,11 @@ You can create multiple isolated contexts, each with their own pages:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_multiple_contexts():
     with sync_playwright() as p:
@@ -108,8 +123,8 @@ def test_multiple_contexts():
         page1 = context1.new_page()
         page2 = context2.new_page()
         
-        page1.goto("https://example.com")
-        page2.goto("https://playwright.dev")
+        page1.goto(get_file_url("page1.html"))
+        page2.goto(get_file_url("page2.html"))
         
         # Each context has separate cookies/storage
         page1.context.cookies()  # Empty
@@ -127,6 +142,11 @@ You can configure contexts with various options:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename="page1.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_context_options():
     with sync_playwright() as p:
@@ -141,7 +161,7 @@ def test_context_options():
         )
         
         page = context.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Note: context.viewport_size may not be available in all Playwright versions
         # The viewport is configured when creating the context
@@ -159,6 +179,11 @@ You can work with multiple pages simultaneously:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_multiple_pages_interaction():
     with sync_playwright() as p:
@@ -169,8 +194,8 @@ def test_multiple_pages_interaction():
         page2 = context.new_page()
         
         # Navigate both pages
-        page1.goto("https://example.com")
-        page2.goto("https://playwright.dev")
+        page1.goto(get_file_url("page1.html"))
+        page2.goto(get_file_url("page2.html"))
         
         # Interact with each page independently
         title1 = page1.title()
@@ -195,6 +220,11 @@ You can listen to page events:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename="page1.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_page_events():
     with sync_playwright() as p:
@@ -213,11 +243,71 @@ def test_page_events():
         
         page.on("pageerror", handle_error)
         
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         browser.close()
 
 if __name__ == "__main__":
     test_page_events()
+```
+
+## HTML Pages for Testing
+
+Here are the HTML pages used in the examples above:
+
+**page1.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page 1 - Browser Context</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #e8f4f8;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Page 1</h1>
+    <p>This is the first page for testing browser contexts.</p>
+</body>
+</html>
+```
+
+**page2.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page 2 - Browser Context</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8e8e8;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Page 2</h1>
+    <p>This is the second page for testing browser contexts.</p>
+</body>
+</html>
 ```
 
 ## Best Practices

@@ -126,22 +126,27 @@ Playwright provides several ways to verify content:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_basic_assertions():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Check page title
-        assert page.title() == "Example Domain"
+        assert page.title() == "First Playwright Test"
         
-        # Check URL
-        assert page.url == "https://example.com/"
+        # Check URL (file URLs will be different)
+        assert "index.html" in page.url
         
         # Check page content
         content = page.content()
-        assert "Example Domain" in content
+        assert "First Playwright Test" in content
         
         browser.close()
 
@@ -181,6 +186,36 @@ def test_page_content():
 
 if __name__ == "__main__":
     test_page_content()
+```
+
+## HTML Page for Testing
+
+Here's the HTML page (`index.html`) used in the examples above:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Playwright Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <h1>First Playwright Test</h1>
+    <p>This page is used for your first Playwright test.</p>
+</body>
+</html>
 ```
 
 ## Common Patterns

@@ -17,17 +17,23 @@ Playwright provides several methods for navigation:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_navigate():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
         # Navigate to a URL
-        page.goto("https://example.com")
+        file_url = get_file_url("page1.html")
+        page.goto(file_url)
         
-        print(f"Current URL: {page.url}")
-        print(f"Page title: {page.title()}")
+        print(f"✓ Current URL: {page.url[:50]}...")
+        print(f"✓ Page title: {page.title()}")
         
         browser.close()
 
@@ -39,15 +45,20 @@ if __name__ == "__main__":
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_navigation_options():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
         # Navigate with options
         page.goto(
-            "https://example.com",
+            get_file_url("page1.html"),
             wait_until="load",  # Wait for load event
             timeout=30000  # 30 second timeout
         )
@@ -67,7 +78,7 @@ from playwright.sync_api import sync_playwright
 
 def test_wait_until():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
         # Wait for DOM content loaded
@@ -97,11 +108,11 @@ from playwright.sync_api import sync_playwright
 
 def test_history():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
         # Navigate to first page
-        page.goto("https://example.com")
+        page.goto(get_file_url("page1.html"))
         print(f"Page 1: {page.url}")
         
         # Navigate to second page
@@ -131,9 +142,9 @@ from playwright.sync_api import sync_playwright
 
 def test_reload():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url("page1.html"))
         
         # Reload page
         page.reload()
@@ -156,12 +167,12 @@ from playwright.sync_api import sync_playwright, expect
 
 def test_url_assertions():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url("page1.html"))
         
         # Assert exact URL
-        expect(page).to_have_url("https://example.com/")
+        expect(page).to_have_url(r".*page1\.html.*")
         
         # Assert URL contains
         expect(page).to_have_url(r".*example.*")
@@ -184,9 +195,9 @@ from playwright.sync_api import sync_playwright
 
 def test_wait_navigation():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url("page1.html"))
         
         # Wait for navigation after click
         with page.expect_navigation():
@@ -209,7 +220,7 @@ from playwright.sync_api import sync_playwright
 
 def test_url_params():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
         # Navigate with query parameters
@@ -238,7 +249,7 @@ from playwright.sync_api import sync_playwright
 
 def test_redirects():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
         # Follow redirects automatically (default)
@@ -267,18 +278,86 @@ if __name__ == "__main__":
 
 ```python
 # Pattern 1: Navigate and wait
-page.goto("https://example.com", wait_until="networkidle")
+page.goto(get_file_url("page1.html"), wait_until="networkidle")
 
 # Pattern 2: Wait for navigation
 with page.expect_navigation():
     page.click("a")
 
 # Pattern 3: Assert URL
-expect(page).to_have_url("https://example.com")
+expect(page).to_have_url(r".*page1\.html.*")
 
 # Pattern 4: Go back/forward
 page.go_back()
 page.go_forward()
+```
+
+## HTML Pages for Testing
+
+Here are the HTML pages used in the examples above:
+
+**page1.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Page 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #e8f4f8;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 18px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Navigation Page 1</h1>
+    <p>This is the first page for testing navigation.</p>
+    <a href="page2.html">Go to Page 2</a>
+</body>
+</html>
+```
+
+**page2.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Page 2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8e8e8;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 18px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Navigation Page 2</h1>
+    <p>This is the second page for testing navigation.</p>
+    <a href="page1.html">Go to Page 1</a>
+</body>
+</html>
 ```
 
 ## Next Steps

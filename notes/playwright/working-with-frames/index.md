@@ -16,12 +16,17 @@ Frames (iframes) are HTML documents embedded within other HTML documents. Playwr
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_access_frame():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Access frame by name
         frame = page.frame(name="frame-name")
@@ -48,9 +53,9 @@ from playwright.sync_api import sync_playwright
 
 def test_frame_interaction():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Get frame
         frame_element = page.locator("iframe")
@@ -80,9 +85,9 @@ from playwright.sync_api import sync_playwright
 
 def test_find_frames():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Get all frames
         frames = page.frames
@@ -110,9 +115,9 @@ from playwright.sync_api import sync_playwright
 
 def test_wait_for_frame():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Wait for frame to appear
         frame_element = page.locator("iframe")
@@ -144,9 +149,9 @@ from playwright.sync_api import sync_playwright
 
 def test_nested_frames():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Access outer frame
         outer_frame = page.frame(name="outer-frame")
@@ -175,9 +180,9 @@ from playwright.sync_api import sync_playwright, expect
 
 def test_frame_assertions():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         frame_element = page.locator("iframe")
         frame = frame_element.content_frame()
@@ -203,9 +208,9 @@ from playwright.sync_api import sync_playwright
 
 def test_switch_frames():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Work with main page
         main_heading = page.locator("h1")
@@ -234,9 +239,9 @@ from playwright.sync_api import sync_playwright
 
 def test_frame_info():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         frames = page.frames
         
@@ -277,6 +282,77 @@ if frame:
 frame_element = page.locator("iframe")
 frame_element.wait_for(state="attached")
 frame = frame_element.content_frame()
+```
+
+## HTML Pages for Testing
+
+Here are the HTML pages used in the examples above:
+
+**index.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working with Frames</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #3498db;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Working with Frames</h1>
+    <p>This page contains iframes for testing frame interactions.</p>
+    
+    <iframe name="content-frame" id="test-frame" src="frame-content.html"></iframe>
+    
+    <iframe name="nested-frame" src="nested-frame.html"></iframe>
+</body>
+</html>
+```
+
+**frame-content.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Frame Content</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Frame Content</h1>
+    <p>This is content inside an iframe.</p>
+    <button>Click Me</button>
+</body>
+</html>
 ```
 
 ## Next Steps

@@ -24,6 +24,7 @@ pnpm-debug.log*
 # Python files
 *.pyc
 **/__pycache__
+**/.pytest_cache/
 *.db
 **/.venv
 **/data.db

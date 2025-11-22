@@ -16,18 +16,37 @@ Handle simple alert dialogs:
 
 ```python
 from playwright.sync_api import sync_playwright
+from pathlib import Path
+
+def get_file_url(filename="index.html"):
+    html_file = Path(__file__).parent / filename
+    return f"file://{html_file.absolute()}"
 
 def test_alert():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Listen for alert dialog
         page.on("dialog", lambda dialog: dialog.accept())
         
-        # Trigger alert (example)
-        page.evaluate("alert('Hello!')")
+        # Listen for alert dialog
+        dialog_handled = False
+        def handle_dialog(dialog):
+            nonlocal dialog_handled
+            print(f"✓ Alert dialog: {dialog.message}")
+            dialog.accept()
+            dialog_handled = True
+        
+        page.on("dialog", handle_dialog)
+        
+        # Trigger alert
+        page.click("button:has-text('Show Alert')")
+        page.wait_for_timeout(500)
+        
+        if dialog_handled:
+            print("✓ Alert handled successfully")
         
         browser.close()
 
@@ -44,9 +63,9 @@ from playwright.sync_api import sync_playwright
 
 def test_confirm():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Accept confirm dialog
         page.on("dialog", lambda dialog: dialog.accept())
@@ -71,9 +90,9 @@ from playwright.sync_api import sync_playwright
 
 def test_prompt():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Handle prompt with input
         page.on("dialog", lambda dialog: dialog.accept("John Doe"))
@@ -95,9 +114,9 @@ from playwright.sync_api import sync_playwright
 
 def test_dialog_wait():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         # Wait for dialog and handle it
         def handle_dialog(dialog):
@@ -125,9 +144,9 @@ from playwright.sync_api import sync_playwright
 
 def test_dialog_info():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         dialog_messages = []
         
@@ -159,13 +178,13 @@ from playwright.sync_api import sync_playwright
 
 def test_before_dialog():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
         
         # Set up dialog handler before navigation
         page.on("dialog", lambda dialog: dialog.accept())
         
-        page.goto("https://example.com")
+        page.goto(get_file_url())
         
         browser.close()
 
@@ -182,9 +201,9 @@ from playwright.sync_api import sync_playwright
 
 def test_file_upload_dialog():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)  # Set headless=False to see browser window
         page = browser.new_page()
-        page.goto("https://example.com/upload")
+        page.goto(get_file_url())
         
         # Set files before clicking upload button
         file_input = page.locator("input[type='file']")
@@ -226,6 +245,67 @@ with page.expect_dialog() as dialog_info:
     page.click("button")
 dialog = dialog_info.value
 dialog.accept()
+```
+
+## HTML Page for Testing
+
+Here's the HTML page (`index.html`) used in the examples above:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handling Alerts and Dialogs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .button-group {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Handling Alerts and Dialogs</h1>
+    
+    <div class="button-group">
+        <button onclick="showAlert()">Show Alert</button>
+        <button onclick="showConfirm()">Show Confirm</button>
+        <button onclick="showPrompt()">Show Prompt</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <script>
+        function showAlert() {
+            alert('Hello! This is an alert dialog.');
+        }
+        
+        function showConfirm() {
+            const result = confirm('Are you sure?');
+            document.getElementById('result').textContent = 'Confirm result: ' + result;
+        }
+        
+        function showPrompt() {
+            const result = prompt('What is your name?', 'John Doe');
+            document.getElementById('result').textContent = 'Prompt result: ' + (result || 'Cancelled');
+        }
+    </script>
+</body>
+</html>
 ```
 
 ## Next Steps
